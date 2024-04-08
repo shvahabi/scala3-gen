@@ -2,12 +2,12 @@
 
 project_title="Hello world!"
 project_name='helloworld'
-munit_version='"1.0.0-M11"'
-scala_3_version='"3.4.1"'
-sbt_version='1.9.9'
+munit_version=$(curl -sL https://api.github.com/repos/scalameta/munit/releases/latest | jq -r ".tag_name" | awk '{ sub(/.*v/, ""); print }')
+scala_3_version=$(curl -sL https://api.github.com/repos/scala/scala3/releases/latest | jq -r ".tag_name")
+sbt_version=$(curl -sL https://api.github.com/repos/sbt/sbt/releases/latest | jq -r ".tag_name" | awk '{ sub(/.*v/, ""); print }')
 project_version='"0.1.0-SNAPSHOT"'
-logbak_version='"1.5.3"'
-$toolkit_vesion='"0.2.1"'
+logbak_version=$(curl -sL https://api.github.com/repos/qos-ch/logback/tags | jq 'map(select(.name | test("alpha") | not)) | first' | jq -r ".name" | awk '{ sub(/.*v_/, ""); print }')
+toolkit_vesion=$(curl -sL https://api.github.com/repos/scala/toolkit/releases/latest | jq -r ".tag_name")
 working_directory=$(pwd)
 cd $working_directory
 
@@ -306,7 +306,7 @@ git branch hotfix/release-version
 git switch exp/hello-world
 
 cat >build.sbt<<EOF
-val scala3Version = $scala_3_version
+val scala3Version = "$scala_3_version"
 
 javacOptions ++= Seq("-source", "8", "-target", "8", "-release", "8")
 scalacOptions ++= Seq("-source", "3.4", "-java-output-version", "8")
@@ -318,9 +318,9 @@ lazy val root = project.in(file("."))
     scalaVersion := scala3Version,
 
     libraryDependencies ++= Seq(      
-      "ch.qos.logback" %  "logback-classic" % $logbak_version,
-      "org.scala-lang" %% "toolkit"         % $toolkit_vesion,
-      "org.scalameta"  %% "munit"           % $munit_version % Test
+      "ch.qos.logback" %  "logback-classic" % "$logbak_version",
+      "org.scala-lang" %% "toolkit"         % "$toolkit_vesion",
+      "org.scalameta"  %% "munit"           % "$munit_version" % Test
     )
   )
 EOF
